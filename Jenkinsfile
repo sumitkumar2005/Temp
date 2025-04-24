@@ -11,14 +11,7 @@ pipeline {
     stages {
        
 
-     stage( 'Checking')
-     {
-        steps{
-            script{
-                ls
-            }
-        }
-     }
+     
 
         stage('Docker Compose Up') {
             steps {
