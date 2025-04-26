@@ -14,6 +14,17 @@ pipeline {
             }
         }
 
+
+         stage('Docker Compose Up') {
+            steps {
+                script {
+                    echo '🔧 Building and starting containers with Docker Compose...'
+                    sh """
+                        CLIENT_IMAGE=${CLIENT_IMAGE} SERVER_IMAGE=${SERVER_IMAGE} docker-compose up -d --build
+                    """
+                }
+            }
+        }
         stage('Docker Login') {
             steps {
                 withCredentials([usernamePassword(credentialsId: "${DOCKER_CREDENTIALS_ID}", passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
@@ -38,16 +49,7 @@ pipeline {
             }
         }
 
-        stage('Docker Compose Up') {
-            steps {
-                script {
-                    echo '🔧 Building and starting containers with Docker Compose...'
-                    sh """
-                        CLIENT_IMAGE=${CLIENT_IMAGE} SERVER_IMAGE=${SERVER_IMAGE} docker-compose up -d --build
-                    """
-                }
-            }
-        }
+       
     }
 
     post {
