@@ -2,47 +2,48 @@ pipeline {
     agent any
 
     environment {
-        CLIENT_IMAGE = "client:latest"
-        SERVER_IMAGE = "server:latest"
-        DOCKER_HUB_CREDENTIALS = credentials('docker-hub')
+        DOCKER_CREDENTIALS_ID = 'docker-hub'
+        CLIENT_IMAGE = "client:${BUILD_NUMBER}"
+        SERVER_IMAGE = "server:${BUILD_NUMBER}"
     }
 
     stages {
-
-        stage('Checking') {
+        stage('Checkout') {
             steps {
-                script {
-                    sh 'ls'
-                }
+                checkout scm
             }
         }
 
         stage('Docker Login') {
             steps {
-                script {
-                    sh """
-                        echo "${DOCKER_HUB_CREDENTIALS_PSW}" | docker login -u "${DOCKER_HUB_CREDENTIALS_USR}" --password-stdin
-                    """
+                withCredentials([usernamePassword(credentialsId: "${DOCKER_CREDENTIALS_ID}", passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
+                    sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin'
                 }
             }
         }
 
-        stage('Docker Compose Up') {
+        stage('Tag Images for Docker Hub') {
             steps {
                 script {
-                    sh """
-                        CLIENT_IMAGE=${CLIENT_IMAGE} SERVER_IMAGE=${SERVER_IMAGE} docker-compose up -d --build
-                    """
+                    sh "docker tag ${CLIENT_IMAGE} sumit589/${CLIENT_IMAGE}"
+                    sh "docker tag ${SERVER_IMAGE} sumit589/${SERVER_IMAGE}"
                 }
             }
         }
 
         stage('Push to Docker Hub') {
             steps {
+                sh "docker push sumit589/${CLIENT_IMAGE}"
+                sh "docker push sumit589/${SERVER_IMAGE}"
+            }
+        }
+
+        stage('Docker Compose Up') {
+            steps {
                 script {
+                    echo '🔧 Building and starting containers with Docker Compose...'
                     sh """
-                        docker push ${CLIENT_IMAGE}
-                        docker push ${SERVER_IMAGE}
+                        CLIENT_IMAGE=${CLIENT_IMAGE} SERVER_IMAGE=${SERVER_IMAGE} docker-compose up -d --build
                     """
                 }
             }
@@ -51,10 +52,13 @@ pipeline {
 
     post {
         success {
-            echo '✅ Deployment Completed Successfully'
+            echo 'Deployment Completed'
         }
         failure {
-            echo '❌ Build Failed'
+            echo 'Build got Failed'
+        }
+        always {
+            sh 'docker logout'
         }
     }
 }
