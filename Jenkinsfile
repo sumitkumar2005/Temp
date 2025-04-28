@@ -1,64 +1,46 @@
 pipeline {
     agent any
-
-    environment {
-        DOCKER_CREDENTIALS_ID = 'docker-hub'
-        CLIENT_IMAGE = "client:${BUILD_NUMBER}"
-        SERVER_IMAGE = "server:${BUILD_NUMBER}"
-    }
-
     stages {
-        stage('Checkout') {
-            steps {
-                checkout scm
-            }
-        }
-
-
-         stage('Docker Compose Up') {
+        stage('Docker Compose Up') {
             steps {
                 script {
-                    echo '🔧 Building and starting containers with Docker Compose...'
-                    sh """
-                        CLIENT_IMAGE=${CLIENT_IMAGE} SERVER_IMAGE=${SERVER_IMAGE} docker-compose up -d --build
-                    """
+                    sh '''
+                   
+                    CLIENT_IMAGE=client SERVER_IMAGE=server docker-compose up -d --build
+                    '''
                 }
             }
         }
         stage('Docker Login') {
             steps {
-                withCredentials([usernamePassword(credentialsId: "${DOCKER_CREDENTIALS_ID}", passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
-                    sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin'
+                withCredentials([usernamePassword(credentialsId: 'docker-hub', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
+                    sh '''
+                    echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
+                    '''
                 }
             }
         }
-
         stage('Tag Images for Docker Hub') {
             steps {
                 script {
-                    sh "docker tag ${CLIENT_IMAGE} sumit589/${CLIENT_IMAGE}"
-                    sh "docker tag ${SERVER_IMAGE} sumit589/${SERVER_IMAGE}"
+                    sh '''
+                    # Tag the built images correctly
+                    docker tag client:latest sumit589/client:latest
+                    docker tag server:latest sumit589/server:latest
+                    '''
                 }
             }
         }
-
         stage('Push to Docker Hub') {
             steps {
-                sh "docker push sumit589/${CLIENT_IMAGE}"
-                sh "docker push sumit589/${SERVER_IMAGE}"
+                sh '''
+                docker push sumit589/client:latest
+                docker push sumit589/server:latest
+                '''
             }
         }
-
-       
     }
-
     post {
-        success {
-            echo 'Deployment Completed'
-        }
-        failure {
-            echo 'Build got Failed'
-        }
         always {
             sh 'docker logout'
         }
