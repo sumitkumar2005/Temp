@@ -3,6 +3,7 @@ version: '3.9'
 services:
   client:
     build: ./client
+    image: client
     container_name: client
     ports:
       - "3000:80"
@@ -12,6 +13,7 @@ services:
 
   server:
     build: ./server
+    image: server
     container_name: server
     ports:
       - "5000:5000"
