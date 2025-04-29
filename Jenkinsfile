@@ -1,41 +1,23 @@
 pipeline {
     agent any
+
     stages {
-        stage('Docker Compose Up') {
+        stage('Build and Deploy with Docker Compose') {
             steps {
                 script {
                     sh '''
-                   
-                    CLIENT_IMAGE=client SERVER_IMAGE=server docker-compose up -d --build
+                    echo "Building and starting Docker Compose services..."
+                    docker-compose -f docker-compose.yml up --build -d
                     '''
                 }
             }
         }
-        stage('Docker Login') {
-            steps {
-                withCredentials([usernamePassword(credentialsId: 'docker-hub', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
-                    sh '''
-                    echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
-                    '''
-                }
-            }
-        }
-        stage('Tag Images for Docker Hub') {
-            steps {
-                script {
-                    sh '''
-                    # Tag the built images correctly
-                    docker tag client:latest sumit589/client:latest
-                    docker tag server:latest sumit589/server:latest
-                    '''
-                }
-            }
-        }
-       
     }
+
     post {
         always {
-            sh 'docker logout'
+            echo 'Cleaning up Docker session...'
+            sh 'docker logout || true'
         }
     }
 }
