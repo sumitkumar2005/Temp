@@ -31,14 +31,7 @@ pipeline {
                 }
             }
         }
-        stage('Push to Docker Hub') {
-            steps {
-                sh '''
-                docker push sumit589/client:latest
-                docker push sumit589/server:latest
-                '''
-            }
-        }
+       
     }
     post {
         always {
