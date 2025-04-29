@@ -31,7 +31,7 @@ const AboutUs = () => {
 
               <div className="box_1_up_right">
                 <div className="box_1_up_right_1">
-                  <text className="createrNameinAbout">Sudesh Thashmika</text>
+                  <text className="createrNameinAbout">Sumit Kumar Jha</text>
                 </div>
 
                 <div className="box_1_up_right_2">
@@ -50,33 +50,7 @@ const AboutUs = () => {
           </Card>
         </div>
 
-        <div className="box_2">
-          <Card className="grayGradient">
-            <div className="box1_Up">
-              <div className="box_1_up_left">
-                <img src={dilukshan} alt="SLSAC" className="logo_1" />
-              </div>
-
-              <div className="box_1_up_right">
-                <div className="box_1_up_right_1">
-                  <text className="createrNameinAbout">Dilukshan Abenayake</text>
-                </div>
-
-                <div className="box_1_up_right_2">
-                  <img src={card1} alt="SLSAC" className="logo_2" />
-                  <img src={card3} alt="SLSAC" className="logo_2" />
-                </div>
-              </div>
-            </div>
-
-            <div className="box1_Down">
-              <text className="CreaterDescription">
-                Designer Developer
-                <br /> Computer Engineering Undergraduate
-              </text>
-            </div>
-          </Card>
-        </div>
+        
       </div>
     </div>
   );
