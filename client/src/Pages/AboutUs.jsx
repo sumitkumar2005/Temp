@@ -17,7 +17,7 @@ const AboutUs = () => {
         </h1>
 
         <p className="DescriptionAbout_1">
-          We are Computer Engineering undergraduates at the faculty of engineering at the University of Ruhuna and currentl we study in second year.
+          We are Computer Engineering undergraduates a at the Lovely Professional  University  and currently I  study in Third  year.
         </p>
       </div>
 
